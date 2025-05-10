@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job Search Helper</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/forms@0.3.4"></script>
+</head>
+<body class="bg-gradient-to-r from-blue-500 to-indigo-600 min-h-screen text-white">
+    <div class="container mx-auto p-8">
+        <!-- Header Section -->
+        <header class="text-center mb-8">
+            <h1 class="text-5xl font-extrabold">Job Search Helper</h1>
+            <p class="text-xl mt-2">Search for jobs, download results in a CSV file</p>
+        </header>
+
+        <!-- Form Section -->
+        <div class="bg-white text-gray-900 p-6 rounded-xl shadow-lg max-w-3xl mx-auto mb-8">
+            <form method="POST" action="/" class="space-y-6">
+                <div>
+                    <label for="search_term" class="block text-lg font-medium">Search Term</label>
+                    <input type="text" id="search_term" name="search_term" class="w-full p-4 bg-gray-50 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500" placeholder="e.g., Python, Java, Marketing" required>
+                </div>
+                <div>
+                    <label for="pages" class="block text-lg font-medium">Number of Pages to Scrape</label>
+                    <input type="number" id="pages" name="pages" min="1" max="5" value="1" class="w-full p-4 bg-gray-50 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500" required>
+                </div>
+                <button type="submit" class="w-full bg-blue-500 text-white py-3 rounded-lg font-bold hover:bg-blue-600 transition duration-200">Search</button>
+            </form>
+        </div>
+
+        <!-- Display Job Listings -->
+        {% if jobs %}
+        <h2 class="text-3xl text-center mb-4">Job Listings</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {% for job in jobs %}
+            <div class="bg-white p-6 rounded-lg shadow-lg hover:shadow-2xl transition duration-300">
+                <h3 class="text-2xl font-semibold text-gray-800">{{ job.title }}</h3>
+                <p class="text-lg mt-2 text-gray-600">{{ job.company }}</p>
+                <p class="text-md mt-1 text-gray-500">{{ job.location }}</p>
+                <p class="text-md mt-2 font-bold text-indigo-600">{{ job.salary }}</p>
+                <a href="{{ job.link }}" target="_blank" class="text-blue-500 hover:underline mt-4 block">View Details</a>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <!-- Download CSV Button -->
+        <div class="text-center mt-6">
+            <a href="{{ url_for('download_file') }}" class="inline-block bg-green-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-green-600 transition duration-200">Download CSV</a>
+        </div>
+        {% endif %}
+
+        <!-- Footer -->
+        <footer class="mt-12 text-center text-sm text-gray-300">
+           <p>© 2025 <a href="https://www.linkedin.com/in/abdul-salam-mk/" target="_blank" class="font-semibold">AbdulSalamMK</a>. All rights reserved.</p>
+        </footer>
+    </div>
+</body>
+</html>
