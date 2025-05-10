@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, send_file
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -15,21 +16,22 @@ app = Flask(__name__)
 if not os.path.exists('static'):
     os.makedirs('static')
 
+# Function to get job data
 def get_job_data(search_term, pages):
     jobs = []
+
+    # Set up headless Chrome for cloud environments
+    chrome_options = Options()
+    chrome_options.add_argument("--headless")
+    chrome_options.add_argument("--no-sandbox")
+    chrome_options.add_argument("--disable-dev-shm-usage")
+    driver = webdriver.Chrome(options=chrome_options)
 
     for page in range(1, pages + 1):
         url = f"https://www.mycareersfuture.gov.sg/search?search={search_term}&sortBy=new_posting_date&page={page}"
 
-        # Setup Chrome WebDriver
-        driver_path = r"C:\Users\Fawaz\OneDrive\Desktop\PROJECTS\chromedriver-win64\chromedriver-win64\chromedriver.exe"
-        options = webdriver.ChromeOptions()
-        options.add_argument("--headless")  # Run without opening a browser window
-        driver = webdriver.Chrome(service=Service(driver_path), options=options)
-
         driver.get(url)
 
-        # Wait for the job cards to load on the page (up to 10 seconds)
         try:
             WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CLASS_NAME, "JobCard__card___22xP3")))
         except Exception as e:
@@ -37,7 +39,6 @@ def get_job_data(search_term, pages):
             driver.quit()
             continue
 
-        # Parse the page with BeautifulSoup
         soup = BeautifulSoup(driver.page_source, "html.parser")
         driver.quit()
 
@@ -80,12 +81,10 @@ def index():
 
     return render_template('index.html')
 
-
 @app.route('/download')
 def download_file():
     file_path = 'static/job_listings.csv'
     return send_file(file_path, as_attachment=True)
-
 
 if __name__ == "__main__":
     app.run(debug=True)
